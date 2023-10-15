@@ -8,4 +8,4 @@ services:
       - 'PGUSER=vainyksi_test'
       - 'POSTGRES_NAME=vainyksi_test'
       - 'POSTGRES_DB=vainyksi_receipts'
-      - 'POSTGRES_PASSWORD=**************'
+      - 'POSTGRES_PASSWORD=${POSTGRES_PASSWORD}'
