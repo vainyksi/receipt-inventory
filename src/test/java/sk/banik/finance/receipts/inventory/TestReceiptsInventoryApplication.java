@@ -26,6 +26,7 @@ public class TestReceiptsInventoryApplication {
         PostgreSQLContainer<?> postgresContainer() {
             return new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"));
         }
+
     }
 
     @Test
