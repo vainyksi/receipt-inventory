@@ -22,31 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 public class DbIntegrationTest {
 
-//    @TestConfiguration
-//    static class TestConfig {
-//        @Bean
-//        @ServiceConnection
-//        PostgreSQLContainer<?> postgresContainer() {
-//            return new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
-//                    .withDatabaseName("test-db-name")
-//                    .withUsername("test-user")
-//                    .withPassword("test-password");
-//        }
-//    }
-
-    // config to use with real external DB:
-    // TODO move to specific test-profile or some kind of a cleaner place
-    @DynamicPropertySource
-    static void registerPgProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", () -> "jdbc:postgresql://<<DB_SERVER>>/vainyksi_receipts");
-        registry.add("spring.datasource.username", () -> "<<USER_NAME>>");
-        registry.add("spring.datasource.password", () -> "<<USER_PASSWORD>>");
-
-        // OR:
-
-        System.setProperty("POSTGRES_SERVER", "<<DB_SERVER>>");
-        System.setProperty("POSTGRES_USER", "<<USER_NAME>>");
-        System.setProperty("POSTGRES_PASSWORD", "<<USER_PASSWORD>>");
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        @ServiceConnection
+        PostgreSQLContainer<?> postgresContainer() {
+            return new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
+                    .withDatabaseName("test-db-name")
+                    .withUsername("test-user")
+                    .withPassword("test-password");
+        }
     }
 
     @Autowired
