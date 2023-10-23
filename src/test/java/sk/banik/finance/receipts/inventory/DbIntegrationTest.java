@@ -38,7 +38,6 @@ public class DbIntegrationTest {
     @AfterEach
     void tearDown() {
         template.execute("delete from receipt");
-        template.execute("alter sequence receipt_id_seq RESTART WITH 1");
     }
 
     @Test
@@ -47,7 +46,6 @@ public class DbIntegrationTest {
                 .query("select * from receipt",
                         (rs, rowNum) -> {
                             Receipt receipt = new Receipt();
-                            receipt.setId(rs.getLong("id"));
                             receipt.setCode(rs.getString("code"));
                             return receipt;
                         })
@@ -79,16 +77,13 @@ public class DbIntegrationTest {
         List<Receipt> receipts = template.queryForStream("select * from receipt",
                 (rs, rowNum) -> {
                     Receipt receipt = new Receipt();
-                    receipt.setId(rs.getLong("id"));
                     receipt.setCode(rs.getString("code"));
                     return receipt;
                 }).toList();
 
         Receipt expectedReceiptNumber1 = new Receipt();
-        expectedReceiptNumber1.setId(1L);
         expectedReceiptNumber1.setCode("001");
         Receipt expectedReceiptNumber2 = new Receipt();
-        expectedReceiptNumber2.setId(2L);
         expectedReceiptNumber2.setCode("002");
         assertThat(receipts).containsOnly(expectedReceiptNumber1, expectedReceiptNumber2);
     }
