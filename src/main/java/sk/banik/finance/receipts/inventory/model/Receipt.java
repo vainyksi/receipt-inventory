@@ -2,6 +2,8 @@ package sk.banik.finance.receipts.inventory.model;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "receipt")
 public class Receipt {
@@ -35,5 +37,18 @@ public class Receipt {
                 "id=" + id +
                 ", code='" + code + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Receipt receipt = (Receipt) o;
+        return Objects.equals(id, receipt.id) && Objects.equals(code, receipt.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, code);
     }
 }

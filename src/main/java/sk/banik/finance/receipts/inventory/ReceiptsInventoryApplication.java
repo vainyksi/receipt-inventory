@@ -16,19 +16,3 @@ public class ReceiptsInventoryApplication {
     }
 
 }
-
-@Configuration
-class JdbcConfiguration {
-    @Bean
-    public ApplicationRunner exampleOfDataReading(JdbcTemplate template){
-        return args -> template
-                .query("select * from receipt",
-                        (rs, rowNum) -> {
-                            Receipt receipt = new Receipt();
-                            receipt.setId(rs.getLong("id"));
-                            receipt.setCode(rs.getString("code"));
-                            return receipt;
-                        })
-                .forEach(System.out::println);
-    }
-}
