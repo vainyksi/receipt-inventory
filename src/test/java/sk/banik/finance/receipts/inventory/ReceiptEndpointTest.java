@@ -2,15 +2,19 @@ package sk.banik.finance.receipts.inventory;
 
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
+import sk.banik.finance.receipts.inventory.model.Receipt;
+import sk.banik.finance.receipts.inventory.model.ReceiptsRepository;
 import sk.banik.finance.receipts.inventory.rest.dto.ReceiptResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,6 +31,9 @@ public class ReceiptEndpointTest {
     private RestTemplateBuilder restTemplateBuilder;
 
     private TestRestTemplate restTemplate;
+
+    @MockBean
+    private ReceiptsRepository receiptsRepository;
 
     @PostConstruct
     void initialize() {
@@ -65,6 +72,12 @@ public class ReceiptEndpointTest {
                 restTemplate.getForEntity("/receipt/all", ReceiptResponse[].class);
         assertThat(allReceiptsBeforeInsertion.getBody()).doesNotContain(new ReceiptResponse(newReceiptId));
 
+        Mockito.when(receiptsRepository.save(Mockito.any(Receipt.class)))
+                .thenAnswer(invocation -> {
+                    Receipt receipt = new Receipt();
+                    receipt.setCode(newReceiptId);
+                    return receipt;
+                });
         String receiptIdCreated = restTemplate.postForObject("/receipt/" + newReceiptId, null, String.class);
         assertEquals(newReceiptId, receiptIdCreated);
 
