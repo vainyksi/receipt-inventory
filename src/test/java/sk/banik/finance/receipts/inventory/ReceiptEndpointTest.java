@@ -22,7 +22,6 @@ public class ReceiptEndpointTest {
 
     @Test
     void helloWorldTestCase() {
-
         String response = restTemplate.getForObject("http://localhost:" + portNumber + "/" +
                         "receipt/hello-world",
                 String.class);
@@ -31,5 +30,12 @@ public class ReceiptEndpointTest {
         Assertions.assertEquals("Hello World!", response);
     }
 
+    @Test
+    void canGetAllReceipts() {
+        String response = restTemplate.getForObject("http://localhost:" + portNumber + "/" +
+                        "receipt/all",
+                String.class);
 
+        Assertions.assertEquals("id1, id2, id3", response);
+    }
 }

@@ -12,4 +12,9 @@ public class ReceiptController {
     public String getHelloWorld() {
         return "Hello World!";
     }
+
+    @GetMapping("/all")
+    public String getAllReceipts() {
+        return "id1, id2, id3";
+    }
 }
