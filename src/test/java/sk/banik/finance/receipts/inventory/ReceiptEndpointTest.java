@@ -9,6 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.ResponseEntity;
+import sk.banik.finance.receipts.inventory.rest.dto.ReceiptResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,9 +39,11 @@ public class ReceiptEndpointTest {
 
     @Test
     void canGetAllReceipts() {
-        String response = restTemplate.getForObject(BASE_URL + "receipt/all", String.class);
+        ResponseEntity<ReceiptResponse[]> allReceipts =
+                restTemplate.getForEntity(BASE_URL + "receipt/all", ReceiptResponse[].class);
 
-        assertEquals("id1, id2, id3", response);
+        assertThat(allReceipts.getBody())
+                .contains(new ReceiptResponse("id1"), new ReceiptResponse("id2"), new ReceiptResponse("id3"));
     }
 
     @Test
@@ -49,7 +53,10 @@ public class ReceiptEndpointTest {
         String receiptIdCreated = restTemplate.postForObject(BASE_URL + "receipt/" + newReceiptId, null, String.class);
         assertEquals(newReceiptId, receiptIdCreated);
 
-        String response = restTemplate.getForObject(BASE_URL + "receipt/all", String.class);
-        assertThat(response).contains(newReceiptId);
+        ResponseEntity<ReceiptResponse[]> allReceipts =
+                restTemplate.getForEntity(BASE_URL + "receipt/all", ReceiptResponse[].class);
+        assertThat(allReceipts.getBody())
+                .contains(new ReceiptResponse("id1"), new ReceiptResponse("id2"), new ReceiptResponse("id3"),
+                        new ReceiptResponse(newReceiptId));
     }
 }
