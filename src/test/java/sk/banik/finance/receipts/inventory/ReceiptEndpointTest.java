@@ -31,13 +31,6 @@ public class ReceiptEndpointTest {
     }
 
     @Test
-    void helloWorldTestCase() {
-        String response = restTemplate.getForObject(BASE_URL + "receipt/hello-world", String.class);
-
-        assertEquals("Hello World!", response);
-    }
-
-    @Test
     void canGetAllReceipts() {
         ResponseEntity<ReceiptResponse[]> allReceipts =
                 restTemplate.getForEntity(BASE_URL + "receipt/all", ReceiptResponse[].class);

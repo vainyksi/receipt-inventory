@@ -16,11 +16,6 @@ public class ReceiptController {
         listOfReceiptIds = new ArrayList<>(List.of("id1", "id2", "id3"));
     }
 
-    @GetMapping("/hello-world")
-    public String getHelloWorld() {
-        return "Hello World!";
-    }
-
     @GetMapping("/all")
     public List<ReceiptResponse> getAllReceipts() {
         return listOfReceiptIds.stream().map(ReceiptResponse::new).toList();
