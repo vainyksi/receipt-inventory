@@ -31,7 +31,19 @@ public class ReceiptEndpointTest {
     }
 
     @Test
-    void canGetAllReceipts() {
+    void shouldReturnEmptyListOfReceiptsFirst() {
+        ResponseEntity<ReceiptResponse[]> allReceipts =
+                restTemplate.getForEntity(BASE_URL + "receipt/all", ReceiptResponse[].class);
+
+        assertThat(allReceipts.getBody()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnAllReceiptsAdded() {
+        restTemplate.postForObject(BASE_URL + "receipt/" + "id1", null, String.class);
+        restTemplate.postForObject(BASE_URL + "receipt/" + "id2", null, String.class);
+        restTemplate.postForObject(BASE_URL + "receipt/" + "id3", null, String.class);
+
         ResponseEntity<ReceiptResponse[]> allReceipts =
                 restTemplate.getForEntity(BASE_URL + "receipt/all", ReceiptResponse[].class);
 
@@ -45,15 +57,15 @@ public class ReceiptEndpointTest {
     void canAddNewReceipt() {
         String newReceiptId = "newReceiptId";
 
+        ResponseEntity<ReceiptResponse[]> allReceiptsBeforeInsertion =
+                restTemplate.getForEntity(BASE_URL + "receipt/all", ReceiptResponse[].class);
+        assertThat(allReceiptsBeforeInsertion.getBody()).doesNotContain(new ReceiptResponse(newReceiptId));
+
         String receiptIdCreated = restTemplate.postForObject(BASE_URL + "receipt/" + newReceiptId, null, String.class);
         assertEquals(newReceiptId, receiptIdCreated);
 
         ResponseEntity<ReceiptResponse[]> allReceipts =
                 restTemplate.getForEntity(BASE_URL + "receipt/all", ReceiptResponse[].class);
-        assertThat(allReceipts.getBody()).contains(
-                new ReceiptResponse("id1"),
-                new ReceiptResponse("id2"),
-                new ReceiptResponse("id3"),
-                new ReceiptResponse(newReceiptId));
+        assertThat(allReceipts.getBody()).contains(new ReceiptResponse(newReceiptId));
     }
 }

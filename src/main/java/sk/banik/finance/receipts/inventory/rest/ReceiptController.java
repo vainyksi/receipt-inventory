@@ -13,7 +13,7 @@ public class ReceiptController {
     private final List<String> listOfReceiptIds;
 
     public ReceiptController() {
-        listOfReceiptIds = new ArrayList<>(List.of("id1", "id2", "id3"));
+        listOfReceiptIds = new ArrayList<>();
     }
 
     @GetMapping("/all")
