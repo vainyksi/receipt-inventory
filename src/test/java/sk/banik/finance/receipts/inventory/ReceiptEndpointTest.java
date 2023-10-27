@@ -35,8 +35,10 @@ public class ReceiptEndpointTest {
         ResponseEntity<ReceiptResponse[]> allReceipts =
                 restTemplate.getForEntity(BASE_URL + "receipt/all", ReceiptResponse[].class);
 
-        assertThat(allReceipts.getBody())
-                .contains(new ReceiptResponse("id1"), new ReceiptResponse("id2"), new ReceiptResponse("id3"));
+        assertThat(allReceipts.getBody()).contains(
+                new ReceiptResponse("id1"),
+                new ReceiptResponse("id2"),
+                new ReceiptResponse("id3"));
     }
 
     @Test
@@ -48,8 +50,10 @@ public class ReceiptEndpointTest {
 
         ResponseEntity<ReceiptResponse[]> allReceipts =
                 restTemplate.getForEntity(BASE_URL + "receipt/all", ReceiptResponse[].class);
-        assertThat(allReceipts.getBody())
-                .contains(new ReceiptResponse("id1"), new ReceiptResponse("id2"), new ReceiptResponse("id3"),
-                        new ReceiptResponse(newReceiptId));
+        assertThat(allReceipts.getBody()).contains(
+                new ReceiptResponse("id1"),
+                new ReceiptResponse("id2"),
+                new ReceiptResponse("id3"),
+                new ReceiptResponse(newReceiptId));
     }
 }
