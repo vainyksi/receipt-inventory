@@ -1,12 +1,12 @@
 package sk.banik.finance.receipts.inventory.rest;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/receipt")
 public class ReceiptController {
+
+    private String listOfReceiptIds = "id1, id2, id3";
 
     @GetMapping("/hello-world")
     public String getHelloWorld() {
@@ -15,6 +15,13 @@ public class ReceiptController {
 
     @GetMapping("/all")
     public String getAllReceipts() {
-        return "id1, id2, id3";
+        return listOfReceiptIds;
+    }
+
+    @PostMapping("/{receiptId}")
+    public String addNewReceiptId(@PathVariable String receiptId) {
+        listOfReceiptIds += ", " + receiptId;
+
+        return receiptId;
     }
 }
