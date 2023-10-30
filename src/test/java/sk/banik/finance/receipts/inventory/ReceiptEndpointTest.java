@@ -17,6 +17,8 @@ import sk.banik.finance.receipts.inventory.model.Receipt;
 import sk.banik.finance.receipts.inventory.model.ReceiptsRepository;
 import sk.banik.finance.receipts.inventory.rest.dto.ReceiptResponse;
 
+import java.util.HashMap;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -33,12 +35,24 @@ public class ReceiptEndpointTest {
     private TestRestTemplate restTemplate;
 
     @MockBean
-    private ReceiptsRepository receiptsRepository;
+    private ReceiptsRepository receiptsRepositoryTestable;
+    private final HashMap<String, Receipt> localStorage = new HashMap<>();
 
     @PostConstruct
     void initialize() {
         String baseUrl = "http://localhost:" + portNumber + "/";
         restTemplate = new TestRestTemplate(restTemplateBuilder.rootUri(baseUrl));
+
+        setupLocalStorageForTesting(receiptsRepositoryTestable);
+    }
+
+    private void setupLocalStorageForTesting(ReceiptsRepository localTestableRepocitory) {
+        Mockito.when(localTestableRepocitory.save(Mockito.any(Receipt.class)))
+                .thenAnswer(invocation -> {
+                    Receipt receipt = invocation.getArgument(0);
+                    localStorage.put(receipt.getCode(), receipt);
+                    return receipt;
+                });
     }
 
     @Test
@@ -72,12 +86,6 @@ public class ReceiptEndpointTest {
                 restTemplate.getForEntity("/receipt/all", ReceiptResponse[].class);
         assertThat(allReceiptsBeforeInsertion.getBody()).doesNotContain(new ReceiptResponse(newReceiptId));
 
-        Mockito.when(receiptsRepository.save(Mockito.any(Receipt.class)))
-                .thenAnswer(invocation -> {
-                    Receipt receipt = new Receipt();
-                    receipt.setCode(newReceiptId);
-                    return receipt;
-                });
         String receiptIdCreated = restTemplate.postForObject("/receipt/" + newReceiptId, null, String.class);
         assertEquals(newReceiptId, receiptIdCreated);
 
