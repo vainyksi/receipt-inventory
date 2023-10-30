@@ -1,6 +1,7 @@
-package sk.banik.finance.receipts.inventory;
+package sk.banik.finance.receipts.inventory.it;
 
 import jakarta.annotation.PostConstruct;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ReceiptDbIT {
+public class ReceiptRestEndpointsWithDbIT {
 
     @LocalServerPort
     private int portNumber;
@@ -47,29 +48,35 @@ public class ReceiptDbIT {
 
     @PostConstruct
     void initialize() {
-        String baseUrl = "http://localhost:" + portNumber + "/";
-        restTemplate = new TestRestTemplate(restTemplateBuilder.rootUri(baseUrl));
+        String appBaseUrl = "http://localhost:" + portNumber + "/";
+        restTemplate = new TestRestTemplate(restTemplateBuilder.rootUri(appBaseUrl));
     }
 
-    @Test
-    void shouldStoreReceiptInDB() {
-        List<Receipt> receiptsStoredBeforeInsertion = jdbcTemplate.query("select * from receipt", (rs, rowNum) -> {
-            Receipt receipt = new Receipt();
-            receipt.setCode(rs.getString("code"));
-            return receipt;
-        });
-        Assertions.assertTrue(receiptsStoredBeforeInsertion.isEmpty());
+    @AfterEach
+    void tearDown() {
+        jdbcTemplate.execute("delete from receipt");
+    }
 
-        restTemplate.postForObject("/receipt/" + "newReceiptId1", null, String.class);
-        restTemplate.postForObject("/receipt/" + "newReceiptId2", null, String.class);
-
+    private List<Receipt> loadReceiptsFromDB() {
         List<Receipt> receiptsStored = jdbcTemplate.query("select * from receipt", (rs, rowNum) -> {
             Receipt receipt = new Receipt();
             receipt.setCode(rs.getString("code"));
             return receipt;
         });
+        return receiptsStored;
+    }
+
+    @Test
+    void shouldStoreReceiptInDB() {
+        List<Receipt> receiptsStoredBeforeInsertion = loadReceiptsFromDB();
+        Assertions.assertTrue(receiptsStoredBeforeInsertion.isEmpty());
+
+        String newReceiptId = "newReceiptId1";
+        restTemplate.postForObject("/receipt/" + newReceiptId, null, String.class);
+
+        List<Receipt> receiptsStored = loadReceiptsFromDB();
 
         assertFalse(receiptsStored.isEmpty());
-        assertEquals("newReceiptId1", receiptsStored.get(0).getCode());
+        assertEquals(newReceiptId, receiptsStored.get(0).getCode());
     }
 }
