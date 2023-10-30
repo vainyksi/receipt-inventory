@@ -1,4 +1,4 @@
-package sk.banik.finance.receipts.inventory;
+package sk.banik.finance.receipts.inventory.it;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -8,19 +8,20 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 import sk.banik.finance.receipts.inventory.model.Receipt;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class DbIntegrationTest {
+
+    // TODO make tests in `it` package able to run with real external DB, instead of test-containers
 
     @TestConfiguration
     static class TestConfig {
@@ -44,49 +45,60 @@ public class DbIntegrationTest {
 
     @Test
     void contextLoads() {
-        template
-                .query("select * from receipt",
-                        (rs, rowNum) -> {
-                            Receipt receipt = new Receipt();
-                            receipt.setCode(rs.getString("code"));
-                            return receipt;
-                        })
-                .forEach(System.out::println);
     }
 
     @Test
-    void canWriteReceiptsToDB() {
-        Integer receiptsBeforeInsert = template.queryForObject(
-                "select count(*) from receipt", Integer.class);
-        assert receiptsBeforeInsert != null;
+    void canWriteDataToDB() {
+        Integer receiptsBeforeInsert = getNumberOfRowsFromDB();
 
-        template.execute("insert into receipt (code) values ('001')");
+        putSomeDataToDB();
 
-        Integer receiptsCountAfterInsert = template.queryForObject(
-                "select count(*) from receipt", Integer.class);
+        Integer receiptsCountAfterInsert = getNumberOfRowsFromDB();
 
         assertEquals(receiptsBeforeInsert + 1, receiptsCountAfterInsert,
                 "Receipts count should increase after inserting to DB");
     }
 
+    private Integer getNumberOfRowsFromDB() {
+        Integer receiptsBeforeInsert = template.queryForObject(
+                "select count(*) from receipt", Integer.class);
+        return Objects.requireNonNullElse(receiptsBeforeInsert, 0);
+    }
+
+    private void putSomeDataToDB() {
+        template.execute("insert into receipt (code) values ('001')");
+    }
+
     @Test
-    void canReadReceiptsFromDB() {
+    void canReadDataFromDB() {
+        List<Receipt> dataStored = putMultipleRowsToDB();
+
+        List<Receipt> dataLoaded = loadStoredDataFromDB();
+
+        assertThat(dataLoaded).containsOnly(dataStored.toArray(Receipt[]::new));
+    }
+
+    private List<Receipt> putMultipleRowsToDB() {
+        Receipt receipt1 = new Receipt();
+        receipt1.setCode("001");
+        Receipt receipt2 = new Receipt();
+        receipt2.setCode("002");
+
         template.batchUpdate(
-                "insert into receipt (code) values ('001')",
-                "insert into receipt (code) values ('002')"
+                "insert into receipt (code) values ('" + receipt1.getCode() + "')",
+                "insert into receipt (code) values ('" + receipt2.getCode() + "')"
         );
 
+        return List.of(receipt1, receipt2);
+    }
+
+    private List<Receipt> loadStoredDataFromDB() {
         List<Receipt> receipts = template.queryForStream("select * from receipt",
                 (rs, rowNum) -> {
                     Receipt receipt = new Receipt();
                     receipt.setCode(rs.getString("code"));
                     return receipt;
                 }).toList();
-
-        Receipt expectedReceiptNumber1 = new Receipt();
-        expectedReceiptNumber1.setCode("001");
-        Receipt expectedReceiptNumber2 = new Receipt();
-        expectedReceiptNumber2.setCode("002");
-        assertThat(receipts).containsOnly(expectedReceiptNumber1, expectedReceiptNumber2);
+        return receipts;
     }
 }
