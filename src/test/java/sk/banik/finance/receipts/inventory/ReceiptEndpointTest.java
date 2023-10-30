@@ -1,6 +1,7 @@
 package sk.banik.finance.receipts.inventory;
 
 import jakarta.annotation.PostConstruct;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,13 @@ public class ReceiptEndpointTest {
                     localStorage.put(receipt.getCode(), receipt);
                     return receipt;
                 });
+        Mockito.when(localTestableRepocitory.findAll())
+                .thenReturn(localStorage.values());
+    }
+
+    @AfterEach
+    void tearDown() {
+        localStorage.clear();
     }
 
     @Test
