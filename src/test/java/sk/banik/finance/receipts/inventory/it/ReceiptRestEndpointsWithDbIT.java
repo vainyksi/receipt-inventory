@@ -12,10 +12,12 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 import sk.banik.finance.receipts.inventory.model.Receipt;
+import sk.banik.finance.receipts.inventory.rest.dto.ReceiptResponse;
 
 import java.util.List;
 
@@ -78,5 +80,17 @@ public class ReceiptRestEndpointsWithDbIT {
 
         assertFalse(receiptsStored.isEmpty());
         assertEquals(newReceiptId, receiptsStored.get(0).getCode());
+    }
+
+    @Test
+    void shouldReadReceiptFromDB() {
+        String newReceiptId = "newReceipt2";
+        jdbcTemplate.update("insert into receipt (code) values ('" + newReceiptId + "')");
+
+        ResponseEntity<ReceiptResponse[]> allReceipts =
+                restTemplate.getForEntity("/receipt/all", ReceiptResponse[].class);
+
+        assertEquals(1, allReceipts.getBody().length);
+        assertEquals(newReceiptId, allReceipts.getBody()[0].id());
     }
 }
