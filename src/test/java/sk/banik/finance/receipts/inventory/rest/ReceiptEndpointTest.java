@@ -1,4 +1,4 @@
-package sk.banik.finance.receipts.inventory;
+package sk.banik.finance.receipts.inventory.rest;
 
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.AfterEach;
