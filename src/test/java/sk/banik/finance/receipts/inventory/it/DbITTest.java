@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-public class DbIntegrationTest {
+public class DbITTest {
 
     // TODO make tests in `it` package able to run with real external DB, instead of test-containers
 
