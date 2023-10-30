@@ -73,24 +73,24 @@ public class ReceiptRestEndpointsWithDbIT {
         List<Receipt> receiptsStoredBeforeInsertion = loadReceiptsFromDB();
         Assertions.assertTrue(receiptsStoredBeforeInsertion.isEmpty());
 
-        String newReceiptId = "newReceiptId1";
-        restTemplate.postForObject("/receipt/" + newReceiptId, null, String.class);
+        String newReceiptCode = "newReceiptCode1";
+        restTemplate.postForObject("/receipt/" + newReceiptCode, null, String.class);
 
         List<Receipt> receiptsStored = loadReceiptsFromDB();
 
         assertFalse(receiptsStored.isEmpty());
-        assertEquals(newReceiptId, receiptsStored.get(0).getCode());
+        assertEquals(newReceiptCode, receiptsStored.get(0).getCode());
     }
 
     @Test
     void shouldReadReceiptFromDB() {
-        String newReceiptId = "newReceipt2";
-        jdbcTemplate.update("insert into receipt (code) values ('" + newReceiptId + "')");
+        String newReceiptCode = "newReceipt2";
+        jdbcTemplate.update("insert into receipt (code) values ('" + newReceiptCode + "')");
 
         ResponseEntity<ReceiptResponse[]> allReceipts =
                 restTemplate.getForEntity("/receipt/all", ReceiptResponse[].class);
 
         assertEquals(1, allReceipts.getBody().length);
-        assertEquals(newReceiptId, allReceipts.getBody()[0].id());
+        assertEquals(newReceiptCode, allReceipts.getBody()[0].code());
     }
 }

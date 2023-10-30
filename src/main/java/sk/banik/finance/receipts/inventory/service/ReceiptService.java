@@ -3,7 +3,7 @@ package sk.banik.finance.receipts.inventory.service;
 import java.util.List;
 
 public interface ReceiptService {
-    List<String> getAllReceiptIds();
+    List<String> getAllReceiptCodes();
 
-    String storeReceiptId(String receiptId);
+    String storeReceiptCode(String receiptCode);
 }

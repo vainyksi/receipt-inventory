@@ -17,16 +17,16 @@ public class ReceiptServiceImpl implements ReceiptService {
     }
 
     @Override
-    public List<String> getAllReceiptIds() {
+    public List<String> getAllReceiptCodes() {
         return StreamSupport.stream(receiptRepository.findAll().spliterator(), false)
                 .map(Receipt::getCode)
                 .toList();
     }
 
     @Override
-    public String storeReceiptId(String receiptId) {
+    public String storeReceiptCode(String receiptCode) {
         Receipt receipt = new Receipt();
-        receipt.setCode(receiptId);
+        receipt.setCode(receiptCode);
         Receipt receiptStored = receiptRepository.save(receipt);
 
         return receiptStored.getCode();

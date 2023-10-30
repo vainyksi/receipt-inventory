@@ -73,32 +73,32 @@ public class ReceiptEndpointTest {
 
     @Test
     void shouldReturnAllReceiptsAdded() {
-        restTemplate.postForObject("/receipt/" + "id1", null, String.class);
-        restTemplate.postForObject("/receipt/" + "id2", null, String.class);
-        restTemplate.postForObject("/receipt/" + "id3", null, String.class);
+        restTemplate.postForObject("/receipt/" + "code1", null, String.class);
+        restTemplate.postForObject("/receipt/" + "code2", null, String.class);
+        restTemplate.postForObject("/receipt/" + "code3", null, String.class);
 
         ResponseEntity<ReceiptResponse[]> allReceipts =
                 restTemplate.getForEntity("/receipt/all", ReceiptResponse[].class);
 
         assertThat(allReceipts.getBody()).contains(
-                new ReceiptResponse("id1"),
-                new ReceiptResponse("id2"),
-                new ReceiptResponse("id3"));
+                new ReceiptResponse("code1"),
+                new ReceiptResponse("code2"),
+                new ReceiptResponse("code3"));
     }
 
     @Test
     void canAddNewReceipt() {
-        String newReceiptId = "newReceiptId";
+        String newReceiptCode = "newReceiptCode";
 
         ResponseEntity<ReceiptResponse[]> allReceiptsBeforeInsertion =
                 restTemplate.getForEntity("/receipt/all", ReceiptResponse[].class);
-        assertThat(allReceiptsBeforeInsertion.getBody()).doesNotContain(new ReceiptResponse(newReceiptId));
+        assertThat(allReceiptsBeforeInsertion.getBody()).doesNotContain(new ReceiptResponse(newReceiptCode));
 
-        String receiptIdCreated = restTemplate.postForObject("/receipt/" + newReceiptId, null, String.class);
-        assertEquals(newReceiptId, receiptIdCreated);
+        String receiptCodeStored = restTemplate.postForObject("/receipt/" + newReceiptCode, null, String.class);
+        assertEquals(newReceiptCode, receiptCodeStored);
 
         ResponseEntity<ReceiptResponse[]> allReceipts =
                 restTemplate.getForEntity("/receipt/all", ReceiptResponse[].class);
-        assertThat(allReceipts.getBody()).contains(new ReceiptResponse(newReceiptId));
+        assertThat(allReceipts.getBody()).contains(new ReceiptResponse(newReceiptCode));
     }
 }

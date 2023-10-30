@@ -19,11 +19,11 @@ public class ReceiptController {
 
     @GetMapping("/all")
     public List<ReceiptResponse> getAllReceipts() {
-        return receiptService.getAllReceiptIds().stream().map(ReceiptResponse::new).toList();
+        return receiptService.getAllReceiptCodes().stream().map(ReceiptResponse::new).toList();
     }
 
-    @PostMapping("/{receiptId}")
-    public String addNewReceiptId(@PathVariable String receiptId) {
-        return receiptService.storeReceiptId(receiptId);
+    @PostMapping("/{receiptCode}")
+    public String addNewReceiptCode(@PathVariable String receiptCode) {
+        return receiptService.storeReceiptCode(receiptCode);
     }
 }
